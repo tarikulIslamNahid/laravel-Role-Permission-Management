@@ -17,6 +17,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+
+// admin routes
+Route::prefix('admin')->group(function () {
+    Route::get('/', 'DashboardController@index')->name('admin.dashboard');
+
+});
