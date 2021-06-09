@@ -29,5 +29,16 @@ Route::prefix('admin')->group(function () {
     Route::resource('roles','RolesController',['names' => 'admin.roles']);
     Route::resource('users','UsersController',['names' => 'admin.users']);
 
+    //admin auth routes
+    Route::get('/login', 'admin\Auth\LoginController@showLogin')->name('admin.login');
+    Route::post('/login/submit', 'admin\Auth\LoginController@login')->name('admin.login.submit');
+    //logout
+    Route::post('/logout/submit', 'admin\Auth\LoginController@logout')->name('admin.logout.submit');
+
+    // password reset
+    Route::get('/password/reset', 'admin\Auth\ResetPasswordController@showLinkRequestForm')->name('admin.password.request');
+    Route::post('/password/reset/submit', 'admin\Auth\ResetPasswordController@reset')->name('admin.password.update');
+
+
 
 });
