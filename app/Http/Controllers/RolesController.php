@@ -29,7 +29,7 @@ class RolesController extends Controller
     {
         $permissions =Permission::all();
         $permissions_group =User::getPermissionsGroups();
-       
+
       return view('backend.roles.create',compact('permissions','permissions_group'));
     }
 
@@ -41,6 +41,7 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
+
         $validateData=$request->validate([
 
             'name' =>'required|max:100|unique:roles'
@@ -88,9 +89,13 @@ return back()->with('exiest','The name already Exists Try Another Name');
      * @param  \App\Roles  $roles
      * @return \Illuminate\Http\Response
      */
-    public function edit(Roles $roles)
+    public function edit($id)
     {
-        //
+        $role =Role::findById($id);
+        $all_permissions =Permission::all();
+        $permissions_group =User::getPermissionsGroups();
+
+      return view('backend.roles.edit',compact('role','all_permissions','permissions_group'));
     }
 
     /**
@@ -100,9 +105,32 @@ return back()->with('exiest','The name already Exists Try Another Name');
      * @param  \App\Roles  $roles
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Roles $roles)
+    public function update(Request $request, $id)
     {
-        //
+
+        $validateData=$request->validate([
+
+            'name' =>'required|max:100'
+        ],
+        [
+            'name.required' =>'Please Give a Role Name'
+        ]
+    );
+
+    $role= Role::findById($id);
+        $permissions=$request->input('permissions');
+
+            if(!empty($permissions)){
+                $role->name=$request->name;
+                $role->save();
+                $role->syncPermissions($permissions);
+            }
+            return back()->with('success','Role Updated Successfully !');
+
+
+
+
+
     }
 
     /**
@@ -111,8 +139,12 @@ return back()->with('exiest','The name already Exists Try Another Name');
      * @param  \App\Roles  $roles
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Roles $roles)
+    public function destroy($id)
     {
-        //
+        $role=Role::findById($id);
+        if(!is_null($role)){
+            $role->delete();
+        }
+        return back()->with('success','Role delete');
     }
 }

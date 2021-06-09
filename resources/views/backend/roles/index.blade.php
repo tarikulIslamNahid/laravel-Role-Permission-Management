@@ -26,6 +26,7 @@
                             <tr>
                                 <th>SL</th>
                                 <th>Name</th>
+                                <th>Permissions</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -36,7 +37,31 @@
                             <tr>
                                 <td>{{$i++}}</td>
                                 <td>{{$role->name}}</td>
-                                <td>Edit</td>
+                                <td width='600px'>
+
+                                        @foreach ($role->permissions as $perm)
+
+
+                                            <span class="badge badge-primary"> {{$perm->name}} </span>
+
+                                    @endforeach
+
+                                </td>
+                                <td>
+                                    <a class="btn btn-primary "href="{{route('admin.roles.edit',$role->id)}}">Edit</a>
+
+                                    <a class="btn btn-danger" href="{{ route('admin.roles.destroy',$role->id) }}"
+                                       onclick="event.preventDefault();
+                                                     document.getElementById('delete-form-{{$role->id}}').submit();">
+                                      Delete
+                                    </a>
+
+                                    <form id="delete-form-{{$role->id}}" action="{{ route('admin.roles.destroy',$role->id) }}" method="POST" class="d-none">
+                                        @method('DELETE')
+                                        @csrf
+                                    </form>
+
+                                </td>
                             </tr>
                             @endforeach
 
