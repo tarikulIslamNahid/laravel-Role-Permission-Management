@@ -24,6 +24,9 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 // admin routes
 Route::prefix('admin')->group(function () {
+
     Route::get('/', 'DashboardController@index')->name('admin.dashboard');
+    Route::resource('roles','RolesController',['names' => 'admin.roles']);
+    // Route::resource('/roles/create','RolesController');
 
 });

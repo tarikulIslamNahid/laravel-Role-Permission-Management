@@ -12,6 +12,8 @@
   <link href="{{asset('backend')}}/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="{{asset('backend')}}/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="{{asset('backend')}}/css/ruang-admin.min.css" rel="stylesheet">
+  <link href="{{asset('backend')}}/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
 </head>
 
 <body id="page-top">
@@ -57,6 +59,17 @@
   <script src="{{asset('backend')}}/js/ruang-admin.min.js"></script>
   <script src="{{asset('backend')}}/vendor/chart.js/Chart.min.js"></script>
   <script src="{{asset('backend')}}/js/demo/chart-area-demo.js"></script>
+  <script src="{{asset('backend')}}/vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="{{asset('backend')}}/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <!-- Page level custom scripts -->
+  <script>
+    $(document).ready(function () {
+      $('#dataTable').DataTable(); // ID From dataTable
+      $('#dataTableHover').DataTable(); // ID From dataTable with Hover
+    });
+  </script>
+@yield('script')
 </body>
 
 </html>
