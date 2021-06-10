@@ -5,10 +5,23 @@ namespace App\Http\Controllers;
 use App\Roles;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+
 class RolesController extends Controller
 {
+
+
+    public $user;
+
+    public function __construct(){
+        $this->middleware(function ($request,$next){
+$this->user=Auth::guard('admin')->user();
+return $next($request);
+        });
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,6 +29,14 @@ class RolesController extends Controller
      */
     public function index()
     {
+
+
+
+        if( is_null($this->user) || !$this->user->can('role.view') ){
+            abort(403,"The User Can Not Access this Page");
+        }
+
+
       $roles =Role::all();
       return view('backend.roles.index',compact('roles'));
     }
@@ -27,6 +48,10 @@ class RolesController extends Controller
      */
     public function create()
     {
+        if( is_null($this->user) || !$this->user->can('role.create') ){
+            abort(403,"The User Can Not Access this Page");
+        }
+
         $permissions =Permission::all();
         $permissions_group =User::getPermissionsGroups();
 
@@ -41,6 +66,9 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
+        if( is_null($this->user) || !$this->user->can('role.create') ){
+            abort(403,"The User Can Not Access this Page");
+        }
 
         $validateData=$request->validate([
 
@@ -59,6 +87,7 @@ return back()->with('exiest','The name already Exists Try Another Name');
       }else{
         $roleCreate= Role::create([
             'name' => $roleName,
+            'guard_name'=>'admin',
             ]);
             if(!empty($permissions)){
                 $roleCreate->syncPermissions($permissions);
@@ -91,7 +120,10 @@ return back()->with('exiest','The name already Exists Try Another Name');
      */
     public function edit($id)
     {
-        $role =Role::findById($id);
+        if( is_null($this->user) || !$this->user->can('role.edit') ){
+            abort(403,"The User Can Not Access this Page");
+        }
+        $role =Role::findById($id,'admin');
         $all_permissions =Permission::all();
         $permissions_group =User::getPermissionsGroups();
 
@@ -107,6 +139,9 @@ return back()->with('exiest','The name already Exists Try Another Name');
      */
     public function update(Request $request, $id)
     {
+        if( is_null($this->user) || !$this->user->can('role.edit') ){
+            abort(403,"The User Can Not Access this Page");
+        }
 
         $validateData=$request->validate([
 
@@ -117,7 +152,7 @@ return back()->with('exiest','The name already Exists Try Another Name');
         ]
     );
 
-    $role= Role::findById($id);
+    $role= Role::findById($id,'admin');
         $permissions=$request->input('permissions');
 
             if(!empty($permissions)){
@@ -141,7 +176,10 @@ return back()->with('exiest','The name already Exists Try Another Name');
      */
     public function destroy($id)
     {
-        $role=Role::findById($id);
+        if( is_null($this->user) || !$this->user->can('role.delete') ){
+            abort(403,"The User Can Not Access this Page");
+        }
+        $role=Role::findById($id,'admin');
         if(!is_null($role)){
             $role->delete();
         }

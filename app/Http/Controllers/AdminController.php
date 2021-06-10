@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Roles;
-use App\User;
+use App\Admin;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-class UsersController extends Controller
-{
+use Illuminate\Support\Facades\Auth;
 
+class AdminController extends Controller
+{
     public $user;
 
     public function __construct(){
@@ -20,6 +20,7 @@ $this->user=Auth::guard('admin')->user();
 return $next($request);
         });
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -27,9 +28,11 @@ return $next($request);
      */
     public function index()
     {
-       
-      $users =User::all();
-      return view('backend.users.index',compact('users'));
+        if(is_null($this->user) || !$this->user->can('admin.view')){
+            abort(403,"The User Cant Access this Page");
+        }
+      $admins =Admin::all();
+      return view('backend.auth.index',compact('admins'));
     }
 
     /**
@@ -39,11 +42,13 @@ return $next($request);
      */
     public function create()
     {
+        if(is_null($this->user) || !$this->user->can('admin.create')){
+            abort(403,"The User Cant Access this Page");
+        }
+
         $roles =Role::all();
-
-      return view('backend.users.create',compact('roles'));
+      return view('backend.auth.create',compact('roles'));
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -53,10 +58,14 @@ return $next($request);
     public function store(Request $request)
     {
 
+        if(is_null($this->user) || !$this->user->can('admin.create')){
+            abort(403,"The User Cant Access this Page");
+        }
         $validateData=$request->validate([
 
             'name' =>'required|max:100',
-            'email' =>'required|max:100|email|unique:users',
+            'email' =>'required|max:100|email|unique:admins',
+            'username' =>'required|max:100|unique:admins',
             'password' =>'required|min:6|confirmed'
         ],
         [
@@ -66,15 +75,16 @@ return $next($request);
         ]
     );
 
-$user=new User;
+$user=new Admin;
 $user->name=$request->name;
 $user->email=$request->email;
+$user->username=$request->username;
 $user->password=Hash::make($request->password);
 $user->save();
 if($request->roles){
     $user->assignRole($request->roles);
 }
-    return back()->with('success','User Create Successfully !');
+    return back()->with('success','Admin Create Successfully !');
 
 
     }
@@ -98,10 +108,15 @@ if($request->roles){
      */
     public function edit($id)
     {
-        $user =User::find($id);
+        if(is_null($this->user) || !$this->user->can('admin.edit')){
+            abort(403,"The User Cant Access this Page");
+        }
+
+
+        $admin =Admin::find($id);
         $roles =Role::all();
 
-      return view('backend.users.edit',compact('roles','user'));
+      return view('backend.auth.edit',compact('roles','admin'));
     }
 
     /**
@@ -113,11 +128,14 @@ if($request->roles){
      */
     public function update(Request $request, $id)
     {
-$user = User::find($id);
+        if(is_null($this->user) || !$this->user->can('admin.edit')){
+            abort(403,"The User Cant Access this Page");
+        }
+$user = Admin::find($id);
         $validateData=$request->validate([
 
             'name' =>'required|max:100',
-            'email' =>'required|max:100|email|unique:users,email,' .$id,
+            'email' =>'required|max:100|email|unique:admins,email,' .$id,
             'password' =>'nullable|min:6|confirmed'
         ],
         [
@@ -128,6 +146,7 @@ $user = User::find($id);
     );
 
 $user->name=$request->name;
+$user->username=$request->username;
 $user->email=$request->email;
 if($request->password){
 
@@ -138,7 +157,7 @@ $user->roles()->detach();
 if($request->roles){
     $user->assignRole($request->roles);
 }
-    return back()->with('success','User Updated Successfully !');
+    return back()->with('success','Admin Updated Successfully !');
 
 
 
@@ -147,15 +166,18 @@ if($request->roles){
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\User  $roles
+     * @param  \App\Admin  $roles
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        $user=User::find($id);
+        if(is_null($this->user) || !$this->user->can('admin.delete')){
+            abort(403,"The User Cant Access this Page");
+        }
+        $user=Admin::find($id);
         if(!is_null($user)){
             $user->delete();
         }
-        return back()->with('success','User delete');
+        return back()->with('success','Admin delete');
     }
 }

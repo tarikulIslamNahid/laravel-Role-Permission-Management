@@ -1,3 +1,6 @@
+@php
+    $user =Auth::guard('admin')->user();
+@endphp
 <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
       <div class="sidebar-brand-icon">
@@ -45,14 +48,26 @@
           </div>
         </div>
       </li>
+      @if ($user->can('admin.create') || $user->can('admin.edit') || $user->can('admin.delete'))
 
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#Admins"
+          aria-expanded="true" aria-controls="Admins">
+          <i class="far fa-fw fa-window-maximize"></i>
+          <span>Admins</span>
+        </a>
+        <div id="Admins" class="collapse" aria-labelledby="headingBootstrap" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="{{route('admin.admins.index')}}">All Admins</a>
+      @if ($user->can('admin.create'))
 
-    <li class="nav-item">
-      <a class="nav-link" href="forms.html">
-        <i class="fab fa-fw fa-wpforms"></i>
-        <span>Forms</span>
-      </a>
-    </li>
+            <a class="collapse-item" href="{{route('admin.admins.create')}}">Create Admin</a>
+            @endif
+
+          </div>
+        </div>
+      </li>
+@endif
 
 
   </ul>

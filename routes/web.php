@@ -28,6 +28,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/', 'DashboardController@index')->name('admin.dashboard');
     Route::resource('roles','RolesController',['names' => 'admin.roles']);
     Route::resource('users','UsersController',['names' => 'admin.users']);
+    Route::resource('admins','AdminController',['names' => 'admin.admins']);
 
     //admin auth routes
     Route::get('/login', 'admin\Auth\LoginController@showLogin')->name('admin.login');
